@@ -1,0 +1,33 @@
+{
+  "name": "musk-algorithm",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Musk 5-Step Algorithm pi-extension — Question → Delete → Simplify → Accelerate → Automate. One tool + /run-musk-algo slash command.",
+  "keywords": ["pi-extension", "pi-package", "musk-algorithm", "pi-skill"],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Danu28/Musk-Algorithm.git"
+  },
+  "pi": {
+    "extensions": ["./extensions/musk-algorithm/index.ts"],
+    "skills": ["./skills/run-musk-algo"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*",
+    "typescript": "^5.5.0"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "build": "echo \"no build needed — loaded via jiti\""
+  }
+}
