@@ -372,10 +372,13 @@ export const muskAlgorithmTool = defineTool({
   renderCall(args, theme) {
     const phase = (args as { phase?: string }).phase ?? "full";
     const task = (args as { task?: string }).task ?? "";
-    const label = phase === "full" ? "overview (1-5)" : `step ${PHASES[phase as Exclude<MuskPhase, "full">]?.step ?? "?"} — ${phase}`;
+    const step = PHASES[phase as Exclude<MuskPhase, "full">]?.step ?? 0;
+    const progress = step ? ` [${step}/5]` : "";
+    const dots = step ? " " + [1, 2, 3, 4, 5].map((s) => (s <= step ? "●" : "○")).join("") : "";
+    const label = phase === "full" ? "overview (1-5)" : `step ${step} — ${phase}${progress}`;
     const title = theme.fg("toolTitle", theme.bold(`musk_algorithm › ${label}`));
     const truncated = task.length > 80 ? task.slice(0, 77) + "…" : task;
-    return new Text(`${title}  ${theme.fg("muted", truncated)}`, 0, 0);
+    return new Text(`${title}${theme.fg("muted", dots)}  ${theme.fg("muted", truncated)}`, 0, 0);
   },
 
   renderResult(result, { expanded }, theme) {
@@ -384,24 +387,61 @@ export const muskAlgorithmTool = defineTool({
       const text = result.content[0];
       return new Text(text?.type === "text" ? text.text.slice(0, 2000) : "", 0, 0);
     }
+    // Helper: progress bar like ███░░ 60%
+    const bar = (step: number) => {
+      const filled = Math.round((step / 5) * 10);
+      return "█".repeat(filled) + "░".repeat(10 - filled) + ` ${step * 20}%`;
+    };
     if (d.phase === "full") {
       const header = theme.fg("accent", theme.bold("Musk Algorithm — Full Overview (1 → 5)"));
       const taskLine = theme.fg("muted", `Task: ${d.task}`);
       const ruleLine = theme.fg("dim", `Rule: ${d.rule}`);
       const next = theme.fg("success", "→ Next: question");
-      if (!expanded) return new Text([header, taskLine, ruleLine, "", next].join("\n"), 0, 0);
+      if (!expanded) {
+        // print-mode: still show the 5 steps inline so collapsed is useful
+        const steps = PHASE_ORDER.map((p) => `${PHASES[p].step}. ${p}`).join(" → ");
+        const preview = theme.fg("muted", steps);
+        return new Text([header, taskLine, ruleLine, preview, "", next, theme.fg("dim", "↕ expand for full checklist")].join("\n"), 0, 0);
+      }
       const body = result.content[0];
       return new Text(body?.type === "text" ? body.text.slice(0, 6000) : "", 0, 0);
     }
-    const header = theme.fg("accent", theme.bold(d.title));
+    const header = theme.fg("accent", theme.bold(`[${d.step}/5] ${d.title}`));
     const principle = theme.fg("muted", d.principle);
     const rule = theme.fg("dim", `Rule: ${d.rule}`);
     const taskLine = theme.fg("text", `Task: ${d.task}`);
+    const progressLine = theme.fg("dim", `${bar(d.step)}  ${"●".repeat(d.step)}${"○".repeat(5 - d.step)}`);
     const next = d.nextPhase
       ? theme.fg("success", `→ Next: ${d.nextPhase}`)
       : theme.fg("success", "→ All 5 steps done — implement now");
     if (!expanded) {
-      return new Text([header, principle, "", taskLine, rule, "", next].join("\n"), 0, 0);
+      // ── PRINT MODE: collapsed now shows checklist/questions/deliverable preview
+      const checklistPreview = d.checklist
+        .slice(0, 3)
+        .map((c, i) => `  ${i + 1}. ${c}`)
+        .join("\n");
+      const moreChecklist = d.checklist.length > 3 ? theme.fg("dim", `  … +${d.checklist.length - 3} more`) : "";
+      const questionsPreview = theme.fg("muted", `Questions: ${d.questions.slice(0, 2).join(" / ")}${d.questions.length > 2 ? " …" : ""}`);
+      const deliverableLine = theme.fg("text", `Deliverable: ${d.deliverable}`);
+      const lines = [
+        header,
+        principle,
+        progressLine,
+        "",
+        taskLine,
+        rule,
+        "",
+        theme.fg("accent", "Checklist:"),
+        checklistPreview,
+        moreChecklist,
+        "",
+        questionsPreview,
+        deliverableLine,
+        "",
+        next,
+        theme.fg("dim", "↕ expand for full questions & markdown"),
+      ].filter(Boolean);
+      return new Text(lines.join("\n"), 0, 0);
     }
     const body = result.content[0];
     return new Text(body?.type === "text" ? body.text.slice(0, 6000) : "", 0, 0);

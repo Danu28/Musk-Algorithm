@@ -96,4 +96,25 @@ describe("musk_algorithm tool", () => {
     assert.equal(ann.idempotentHint, true);
     assert.equal(ann.openWorldHint, false);
   });
+
+  it("print mode: collapsed renderResult is verbose (checklist + deliverable + progress)", async () => {
+    const res = await call({ phase: "question", task: "Print mode visibility" });
+    const theme: any = { fg: (_c: string, s: string) => s, bold: (s: string) => s };
+    const collapsed = (muskAlgorithmTool as any).renderResult(res, { expanded: false }, theme) as { text: string };
+    assert.match(collapsed.text, /\[1\/5\]/);
+    assert.match(collapsed.text, /Checklist:/);
+    assert.match(collapsed.text, /Deliverable:/);
+    assert.match(collapsed.text, /→ Next: delete/);
+    assert.match(collapsed.text, /█.*20%/); // progress bar
+    const expanded = (muskAlgorithmTool as any).renderResult(res, { expanded: true }, theme) as { text: string };
+    assert.match(expanded.text, /Challenge questions/);
+  });
+
+  it("print mode: renderCall shows progress dots and step", () => {
+    const theme: any = { fg: (_c: string, s: string) => s, bold: (s: string) => s };
+    const callView = (muskAlgorithmTool as any).renderCall({ phase: "delete", task: "X" }, theme) as { text: string };
+    assert.match(callView.text, /step 2 — delete/);
+    assert.match(callView.text, /●●○○○/);
+    assert.match(callView.text, /\[2\/5\]/);
+  });
 });
