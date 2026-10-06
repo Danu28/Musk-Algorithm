@@ -16,9 +16,9 @@
   },
   "files": ["extensions/", "skills/", "LICENSE", "README.md"],
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*",
-    "@earendil-works/pi-ai": "*",
-    "typebox": "*"
+    "@earendil-works/pi-coding-agent": "^1.0.0",
+    "@earendil-works/pi-ai": "^1.0.0",
+    "typebox": "^0.34.0"
   },
   "devDependencies": {
     "@earendil-works/pi-ai": "*",

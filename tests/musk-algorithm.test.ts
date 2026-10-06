@@ -117,4 +117,19 @@ describe("musk_algorithm tool", () => {
     assert.match(callView.text, /●●○○○/);
     assert.match(callView.text, /\[2\/5\]/);
   });
+
+  it("error: missing/empty task throws", async () => {
+    await assert.rejects(() => call({ phase: "question", task: "" }), /task.*required/i);
+    await assert.rejects(() => call({ phase: "delete", task: "   " } as any), /task.*required/i);
+  });
+
+  it("error: task/context/priorFindings too long throws", async () => {
+    await assert.rejects(() => call({ phase: "question", task: "a".repeat(2001) }), /too long/i);
+    await assert.rejects(() => call({ phase: "question", task: "ok", context: "x".repeat(5001) }), /too long/i);
+    await assert.rejects(() => call({ phase: "delete", task: "ok", priorFindings: "y".repeat(5001) }), /too long/i);
+  });
+
+  it("error: unknown phase throws", async () => {
+    await assert.rejects(() => call({ phase: "unknown" as any, task: "hello" }), /Unknown phase/i);
+  });
 });
