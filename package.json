@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Musk 5-Step Algorithm pi-extension — Question → Delete → Simplify → Accelerate → Automate. One tool + /run-musk-algo slash command.",
   "keywords": ["pi-extension", "pi-package", "musk-algorithm", "pi-skill"],
-  "author": "",
+  "author": "Danu28",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,20 +14,24 @@
     "extensions": ["./extensions/musk-algorithm/index.ts"],
     "skills": ["./skills/run-musk-algo"]
   },
+  "files": ["extensions/", "skills/", "LICENSE", "README.md"],
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*",
-    "@earendil-works/pi-ai": "*",
-    "typebox": "*"
+    "@earendil-works/pi-coding-agent": "^1.0.0",
+    "@earendil-works/pi-ai": "^1.0.0",
+    "typebox": "^0.34.0"
   },
   "devDependencies": {
-    "@earendil-works/pi-ai": "*",
-    "@earendil-works/pi-coding-agent": "*",
-    "@earendil-works/pi-tui": "*",
-    "typebox": "*",
-    "typescript": "^5.5.0"
+    "@earendil-works/pi-ai": "^1.0.0",
+    "@earendil-works/pi-coding-agent": "^1.0.0",
+    "@earendil-works/pi-tui": "^1.0.0",
+    "typebox": "^0.34.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
   },
   "scripts": {
     "check": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "test:vitest": "vitest run",
     "build": "echo \"no build needed — loaded via jiti\""
   }
 }

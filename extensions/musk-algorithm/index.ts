@@ -314,10 +314,24 @@ export const muskAlgorithmTool = defineTool({
   ],
 
   async execute(_toolCallId, params, _signal, _onUpdate, _ctx) {
+    const MAX_TASK = 2000;
+    const MAX_CONTEXT = 5000;
+    const MAX_FINDINGS = 5000;
     const phase = (params.phase ?? "full") as MuskPhase;
     const task = params.task?.trim();
     if (!task) {
       throw new Error("`task` is required — describe the goal to apply the 5-step algorithm to.");
+    }
+    if (task.length > MAX_TASK) {
+      throw new Error(`\`task\` too long (${task.length} > ${MAX_TASK} chars) — be concise (1-2 sentences).`);
+    }
+    if (params.context && params.context.length > MAX_CONTEXT) {
+      throw new Error(`\`context\` too long (${params.context.length} > ${MAX_CONTEXT} chars) — trim to relevant details.`);
+    }
+    if (params.priorFindings && params.priorFindings.length > MAX_FINDINGS) {
+      throw new Error(
+        `\`priorFindings\` too long (${params.priorFindings.length} > ${MAX_FINDINGS} chars) — pass a concise deliverable summary.`,
+      );
     }
 
     if (phase === "full") {
